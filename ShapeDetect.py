@@ -40,10 +40,11 @@ def processStripesFull(image, kernel, threshold=200, debug=False ):
 	dilation = cv2.dilate(erosion, kernel, iterations=1)
 	_, thresh = cv2.threshold(dilation,200,255,1)
 
+
 	if debug:
 		cv2.imshow("erosion", erosion)
 		cv2.imshow("dilation", dilation)
-		cv2.imshow("processed stripe:", thresh)
+		cv2.imshow("After processing:", thresh)
 		cv2.waitKey(0)
 
 	return thresh
@@ -66,10 +67,12 @@ def detectShapeCount(processed_img, debug=False):
 			shape.append(OVAL)
 		else:
 			shape.append(SQUIGGLE)
-	if debug:
-		print(shape)
-
+	
+	# print(contours,shape)
+	
+	
 	return shape[0], len(shape) - 1 
+
 
 # for debugging
 if __name__ == "__main__":
@@ -89,7 +92,9 @@ if __name__ == "__main__":
 	if args['empty']:
 		x = processHollow(image)
 	else:
-		x = processStripesSolid(image,kernel,0)
+		x = processStripesFull(image,kernel,0,True)
 
 	print(detectShapeCount(x))
+	cv2.imshow("the image is" ,image)
+	cv2.waitKey(0)
 

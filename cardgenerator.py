@@ -2,7 +2,7 @@
 
 import numpy as np
 import cv2
-import argparse
+
 
 
 
@@ -11,40 +11,65 @@ from ColorDetect import *
 from FillDetect import *
 from ShapeDetect import *
 
-
-ap = argparse.ArgumentParser()
-ap.add_argument("-i", "--image", required=True, help="Path to the set card img")
-ap.add_argument("-d", "--debug", action="store_true") # flag for debug
-args = vars(ap.parse_args())
-
-image = cv2.imread(args['image'])
-image0 = cv2.imread(args['image'],0)
-# image = image [ 4 :-4]
-# image0 = image0 [ 4 :-4] (optional cropping)
-
-debug = args['debug']
-
-kernel = np.ones((5,5), np.uint8) # Kernel for the erosion and dilation (for solid /hollow only)
-purpb = np.array ([80, 0, 80]), np.array([160,60,160])
-greenb = np.array([0,100,0]), np.array([45,180,45])
-redb = np.array([0,0,160]), np.array([30,30,255])
+KERNEL = np.ones((5,5), np.uint8) # Kernel for the erosion and dilation (for solid /hollow only)
+PURPB = np.array ([80, 0, 80]), np.array([160,60,160])
+GREENB = np.array([0,100,0]), np.array([45,180,45])
+REDB = np.array([0,0,160]), np.array([30,30,255])
 
 
 
-if is_Stripe(image0,12):
-	fill = STRIPE
-else:
-	fill = Hollow_or_Full(image0, kernel)
+def create_Card(img, kernel):
+	""" 
+	Pass in the path to the image file
+	"""
 
-color = find_Color(image, purpb, greenb, redb)
 
-if fill == HOLLOW:
-	processed_img = processHollow(image0)
-else:
-	processed_img = processStripesFull(image0, kernel)
+	image = cv2.imread(img)
+	image0 = cv2.imread(img,0) # BW
 
-shape, count = detectShapeCount(processed_img)
 
-card = SetCard(shape,color,fill,count)
+	color, pixel_count = find_Color(image, PURPB, GREENB, REDB)
 
-print(card)
+	if is_Stripe(image0,12):
+		fill = STRIPE
+	else:
+		fill = Hollow_or_Full(image0, KERNEL,color,pixel_count)
+
+	
+
+	if fill == HOLLOW: # The solid green oval shapes may be mistakenly taken as hollow
+		processed_img = processHollow(image0)
+	else: 
+		processed_img = processStripesFull(image0, KERNEL)
+ 
+	shape, count = detectShapeCount(processed_img)
+	
+
+	debug = False
+	if debug:
+		print("creating a card:")
+		print(f"shape{shape}")
+		print(f"color{color}")
+		print(f"fill{fill}")
+		print(f"count{count}")
+
+	return SetCard(shape,color,fill,count)
+
+if __name__ == '__main__':
+	import argparse
+
+	ap = argparse.ArgumentParser()
+	ap.add_argument("-i", "--image", required=True, help="Path to the set card img")
+	ap.add_argument("-d", "--debug", action="store_true") # flag for debug
+	args = vars(ap.parse_args())
+
+	image = args['image']
+
+	# image = image [ 4 :-4]
+	# image0 = image0 [ 4 :-4] (optional cropping)
+
+	debug = args['debug']
+
+	s_card = create_Card(image,KERNEL) # call function in debug mode
+	print(s_card)
+

@@ -6,12 +6,16 @@ from scipy.signal import argrelextrema
 from scipy.signal import find_peaks
 import peakutils
 
-from SetCard import HOLLOW, STRIPE, FULL
+from SetCard import HOLLOW, STRIPE, FULL, GREEN, RED, PURPLE
+from ColorDetect import find_Color
 
 
-# First process the stripe:
+
 def is_Stripe(image, number_peaks=12):
 	""" Returns boolean, if striped. Parameters: threshold for peaks """
+
+	# remove noise
+	image = image [ 4 :-4]
 
 	# First we take the derivative (f'(x)) on the y-axis to see if there are crazy changes
 	fpx = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=5)
@@ -27,7 +31,12 @@ def is_Stripe(image, number_peaks=12):
 	
 	return (filtered_peaks) > number_peaks
 
-def Hollow_or_Full(image,kernel):
+
+
+
+	
+
+def Hollow_or_Full(image,kernel,color, pixel_count):
 	""" Pass in an erosion/dilation kernel. Image must be cv2.imread(image,0)  """
 
 	# erode/dilate to magnify the thin pixels
@@ -36,26 +45,34 @@ def Hollow_or_Full(image,kernel):
 	_, thresh = cv2.threshold(dilation,200,255,1)
 
 	# mark the change from white to black
+
 	first_deriv_y = cv2.Sobel(thresh, cv2.CV_64F, 0,1,ksize=5)
-	vpr_1 = cv2.reduce(first_deriv_y, 1, cv2.REDUCE_SUM)
-	vpr_1_p = np.sqrt(vpr_1**2).flatten()
+	vpr_1y = cv2.reduce(first_deriv_y, 1, cv2.REDUCE_SUM)
+	
+
+	# for the y
+	vpr_1y_p = np.sqrt(vpr_1y**2).flatten()
 
 	# Find every peak index, and access the height of the peak
-	unfiltered_peaks, _ = find_peaks(vpr_1_p, height=0)
-	all_peaks = (vpr_1_p[i] for i in unfiltered_peaks)
+	unfiltered_peaks_y, _ = find_peaks(vpr_1y_p, height=0)
+	all_peaks_y = (vpr_1y_p[i] for i in unfiltered_peaks_y)
 	
 	# I just arbitrarily set the threshold to .32 (noise reduction)
-	peak_thresh = max(all_peaks) * .32 # cuto ff is 1/3rd of the highest peak
+	peak_thresh_y = max(all_peaks_y) * .32 # cuto ff is 1/3rd of the highest peak
+	approx_peaks_y= sum(1 for i in unfiltered_peaks_y if vpr_1y_p[i] >= peak_thresh_y)
 
 
-	approx_peaks = sum(1 for i in unfiltered_peaks if vpr_1_p[i] >= peak_thresh)
-
-	if approx_peaks == 6: # is also a diamond
+	if approx_peaks_y == 6: # is also a diamond
 		return HOLLOW 
-	elif approx_peaks == 2:
+	elif approx_peaks_y == 2:
 		return FULL
-	elif approx_peaks == 4:
-		return HOLLOW 
+	elif approx_peaks_y == 4: # unique case . can be either hollow or a solid oval
+		if color == GREEN and pixel_count > 3500:
+			return FULL
+		else:
+			return HOLLOW 
+	else:
+		raise TypeError("In Hollow_or_Full from FillDetect.py. Neither Full nor Hollow - no peaks found for this image")
 
 
 
@@ -66,18 +83,30 @@ if __name__ == '__main__':
 	ap = argparse.ArgumentParser()
 	ap.add_argument("-i", "--image", required=True, help="path to the input image")
 	ap.add_argument("-d", "--debug", action="store_true")
+	ap.add_argument("-g", "--green_oval", action="store_true", help="is a solid green oval")
+	
 	args = vars(ap.parse_args())
 
 	debug = args['debug']
+
+	PURPB = np.array ([80, 0, 80]), np.array([160,60,160])
+	GREENB = np.array([0,100,0]), np.array([45,180,45])
+	REDB = np.array([0,0,160]), np.array([30,30,255])
+
+	color_image = cv2.imread(args['image'])
 	image = cv2.imread(args['image'],0) # read image in BW 
 	image = image [ 4 :-4] # Numpy slice the last 4 pixels (noise removal)
+	# cv2.imshow("sliced", image)
+	# cv2.waitKey(0)
 
 	kernel = np.ones((5,5), np.uint8) # Kernel for the erosion and dilation
 
+	color, pixel_count = find_Color(color_image,PURPB,GREENB,REDB)
+	
 	if is_Stripe(image,12): # using 12 
 		print("is a stripe")
 	else:
-		fill = Hollow_or_Full(image, kernel)
+		fill = Hollow_or_Full(image, kernel,color, pixel_count)
 		if fill == FULL:
 			print("is full")
 		elif fill == HOLLOW:
