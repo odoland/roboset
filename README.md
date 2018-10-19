@@ -1,11 +1,18 @@
 # roboset
-This is just a little robot to play set! (WIP)
+This is just a little robot to play set! 
 
-image process/computer vision with OpenCV, automation and crawling with Selenium, 
-number crunching/plotting thx to NumPy, matplotlib, scipy
-with a set algorithm 
+video demo:
+https://www.youtube.com/watch?v=6uBgwcrD5Z4
 
-all parameters, unfortunately, were manually learned by a human through a crap ton of trials, guess and check and error.
+image processing/computer vision with OpenCV, 
+automation and crawling with Selenium, 
+image analysis with NumPy arrays
+plotting and data with matplotlib and scipy
+
+My algorithms:
+Sobel derivatives & filtered for peaks of 1/3rd (manually decided paramter) + pixel density for  fill / color
+contour finding for shape. pixel + contour for ct and shape estimation
+paired combinations + hash map for n^2 search, divmod complementary numeric match for finding set
 
 future goals:
-machine learn the parameters instead of manual
+machine learn the parameters instead of manually adjusting them
