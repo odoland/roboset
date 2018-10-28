@@ -10,9 +10,9 @@ image analysis with NumPy arrays
 plotting and data with matplotlib and scipy
 
 My algorithms:
-Sobel derivatives & filtered for peaks of 1/3rd (manually decided paramter) + pixel density for  fill / color
-contour finding for shape. pixel + contour for ct and shape estimation
-paired combinations + hash map for n^2 search, divmod complementary numeric match for finding set
+Sobel derivatives & filtered for peaks of 1/3rd (manually decided parameter) + pixel density for  fill / color.
+contour/edge detection for shape. pixel + contour for countt and shape estimation
+mapping w/ nested to find paired combinations + complementary match for finding set (see comments in the files)
 
 future goals:
-machine learn the parameters instead of manually adjusting them
+incorporate the model into a machine learning algorithm
