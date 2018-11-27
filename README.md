@@ -50,6 +50,8 @@ Then I just had to filter the image for all pixels that fell in this range, and 
 
 **Update: 2018/11/02**
 Currently working on detecting the color in an imperfect image (real life photograph). 
+**Update: 2018/11/15**
+see color.py -> Naive Bayes classifier, using ratio of red, green, and purple pixels (from filtering through HSV) as the feature vector.
 
 ### Detecting Shape and Count
 To approximate the shape, I found all the contours (just a shape that joins all the points together as a continuos line)
@@ -106,7 +108,8 @@ To fix this, I just blurred the image (also with an erosion and dilation) to smo
 To fix this, I used a floodfill on the corner and then inverted the image - effectively turning any hollow images into solid forms.
 This way all images are pushed into 'solid' images for more accurate shape detection.
 
-**Set Finding Algorithm**
+
+** Set Finding Algorithm **
 
 Here's the pattern I observed:
 So we could store each attribute element as an integer (0, 1, 2). A set occurs when all elements are either unique, or in triplets.
