@@ -1,4 +1,8 @@
-# Functions to figure out the fill
+"""
+Fill Detection Module
+author @odoland
+"""
+
 import cv2
 import numpy as np 
 from scipy.signal import find_peaks
@@ -6,24 +10,33 @@ from scipy.signal import find_peaks
 from SetCard import HOLLOW, STRIPE, FULL, GREEN, RED, PURPLE
 from ColorDetect import find_Color
 
-# Arbitrary peak threshold value (as percentage of the maximum peak length)
-PEAK_THRESH = 0.33 # my default is set at approx 1/3rd
+# Threshold for the peaks
+PEAK_THRESH = 0.33 
 
 
-def is_Stripe(image, number_peaks=12):
-	""" Returns boolean, if striped. Parameters: threshold for the count of peaks to be qualified as a stripe.
-	What work well so far as of 10/ """
+def is_Stripe(image, number_peaks=12): # -> Boolean
+	""" Checks if the image is striped.
+	@Parameters: image matrix (binary form - black and white)
+				number_peaks (int) Number of peaks to be considered 'striped'
+
+	@Returns Boolean, if striped.
+	"""
 
 	# Crop the edges
 	image = image [ 4 :-4]
 
-	# Seek crazy changing  rates across the y-axis of the image w/ Sobel algorithm to estimate the first derivative
-	fpx = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=5) # Take only the across y-axis (vertically)
-	vpr= cv2.reduce(fpx, 1, cv2.REDUCE_SUM) # Project it onto a 1D np array
-	vpr_p= np.sqrt(vpr**2).flatten() # Flip the signs of negative changes
+	# Use the Sobel operator across the Y to obtain the Gradient
+	fpx = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=5) # vertical
+	
+	# Project it onto single dimension (1D) - by summing them
+	vpr= cv2.reduce(fpx, 1, cv2.REDUCE_SUM)
 
+	# Squaring and square rooting removes the negative sign, and flatten
+	vpr_p= np.sqrt(vpr**2).flatten() 
 	# Large spikes on f'(x) indicate change in the rate of change - seek areas where slope of the second derivative is 0
 	unfiltered_peaks, _ = find_peaks(vpr_p, height=0) # Finding peaks
+	
+	# Filter the peaks for noise which will be defined as any peak with an absolute height of less than PEAK_THRESH * maximum peak length
 	all_peaks = (vpr_p[i] for i in unfiltered_peaks)
 	peak_thresh = max(all_peaks) * PEAK_THRESH 
 	filtered_peaks = sum(1 for i in unfiltered_peaks if vpr_p[i] >= peak_thresh)
@@ -31,16 +44,20 @@ def is_Stripe(image, number_peaks=12):
 	return (filtered_peaks) > number_peaks
 
 
-def Hollow_or_Full(image, kernel, color, pixel_count):
-	""" Pass in an erosion/dilation kernel. Image must be cv2.imread(image,0). Pass in the color and pixel_count reads
-	from ColorDetect module.  """
+def Hollow_or_Full(image, kernel, color, pixel_count): # -> Returns either SetCard.HOLLOW or SetCard.FULL
+	""" Checks if the image is Hollow or Full
+	@Parameters: image matrix (binary form - black and white)
+				kernel (5x5) kernel. Default: kernel = np.ones((5,5), np.uint8) (for erosion/ dilation)
+				color (int - Global Variable: SetCard.GREEN, SetCard.PURPLE, SetCard.RED)
+				pixel_count (count of the pixels)
+	@Returns A shape (integer), which is a SetCard.HOLLOW or SetCard.FULL  """
 
-	# Image preprocessing - magnification of the thinly drawn hollow. TODO: solids should be exempt
+	# Image preprocessing - magnification of the thinly drawn hollow images
 	erosion = cv2.erode(image,kernel,iterations=1)		
 	dilation = cv2.dilate(erosion,kernel,iterations=1)
-	_, thresh = cv2.threshold(dilation,200,255,1) # Threshold cut off value at 200 (white)
+	_, thresh = cv2.threshold(dilation,200,255, cv2.THRESH_BINARY_INV) # Threshold cut off value at 200 (white)
 
-	# mark the change from white to black
+	# Use the Sobel operator across the Y to obtain the Gradient, projecting & removing negative signs
 	first_deriv_y = cv2.Sobel(thresh, cv2.CV_64F, 0,1,ksize=5)
 	vpr_1y = cv2.reduce(first_deriv_y, 1, cv2.REDUCE_SUM)
 	vpr_1y_p = np.sqrt(vpr_1y**2).flatten()
@@ -49,12 +66,11 @@ def Hollow_or_Full(image, kernel, color, pixel_count):
 	unfiltered_peaks_y, _ = find_peaks(vpr_1y_p, height=0)
 	all_peaks_y = (vpr_1y_p[i] for i in unfiltered_peaks_y)
 	
-	# I just arbitrarily set the threshold to .32 (noise reduction)
-	peak_thresh_y = max(all_peaks_y) * .32 # cuto ff is 1/3rd of the highest peak
+	peak_thresh_y = max(all_peaks_y) * (PEAK_THRESH-0.01) 
 	approx_peaks_y= sum(1 for i in unfiltered_peaks_y if vpr_1y_p[i] >= peak_thresh_y)
 
 
-	# Todo: Be replaced with an actual neural network
+	# 
 	if approx_peaks_y == 6: # Is also a diamond # To do, add extra weight to that
 		return HOLLOW 
 	elif approx_peaks_y == 2:

@@ -1,29 +1,30 @@
 """ 
-Functions to determine shape and also count - dependent on the fill
+Shape Detection and Shape counter Module
+author @odoland
 """
 
-
-# This section will handle hollows - using a floodfill
 import cv2
-import numpy as np 
+import numpy as np
 from matplotlib import pyplot as plt 
+
 
 from SetCard import DIAMOND, SQUIGGLE, OVAL
 from SetCard import ONE, TWO, THREE
 
 
-# all these functions take in BW grayscale 
-def processHollow(image,threshold=200,debug=False):
-	""" 
-	preprocessing hollow for shapeDetector()
-	Floodfill for hollow shapes for more accurate shape detection 
+def processHollow(image, threshold=200, debug=False):
+	""" Processes the image file if it is a hollow image by converting it into a solid.
+	@Parameters: image (np.array) 3 dimensions
+				threshold (int) - threshold value for BW - default at 200
+				debug (boolean) - flag to display the images for developing
+	@Returns: processed image (np.array)
 	"""
 
-	# convert to just B/W
-	ret, thresh_clean = cv2.threshold(image,threshold,255,1)
+	# Threshold image to black and white.
+	ret, thresh_clean = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY_INV)
 	im_floodfill = thresh_clean.copy()
 	
-	# Mark used to flood filling
+	# Floodfill the image
 	h, w = im_floodfill.shape[:2]
 	mask = np.zeros( (h+2, w+2), np.uint8)
 	cv2.floodFill(im_floodfill, mask, (0,0), 255); # Fill from (0,0)
@@ -37,11 +38,20 @@ def processHollow(image,threshold=200,debug=False):
 
 	return im_floodfill_inv
 
-def processStripesFull(image, kernel, threshold=200, debug=False ):
-	""" 
-	preprocessing Stripes/ full for shapeDetector()
-	default kernel is just, kernel = np.ones((5,5), np.uint8)
+def processStripesFull(image, kernel=None, threshold=200, debug=False ):
+	""" Processes Stripes and Full image by 1 iteration of blur and erosion.
+	
+	@Parameters: image (np.array) 
+				kernel (default is  kernel = np.ones((5,5), np.uint8)
+				threshold (int) threshold value for BW - default 200
+				debug (boolean) - flag to display images for developing
+
+	@Returns: processed striped or solid image (np.array)
 	"""
+
+	if kernel is None:
+		kernel = np.ones((5,5), np.uint8)
+
 	image = image [ :-4, :] # Crop out last 4 pixels 
 	erosion = cv2.erode(image, kernel, iterations=1)
 	dilation = cv2.dilate(erosion, kernel, iterations=1)
@@ -58,14 +68,17 @@ def processStripesFull(image, kernel, threshold=200, debug=False ):
 
 
 def detectShapeCount(processed_img, debug=False):
-	""" Input, an image and returns a a tuple of the shape and a count """
-	_, contours, _ = cv2.findContours(processed_img,1,2)
+	""" Input takes in a processed image, either from processHollow() or processStripesFull()
+	@Parameters: processed_img (np.array), processed after one of two functions
+	@Return: Tuple of the shape, and the count (int, count)
+	Shape is a global variable (DIAMOND, OVAL, or SQUIGGLE) which is an int
+	"""
+	_, contours, _ = cv2.findContours(processed_img, 1, 2)
 
 	shape = []
 	for cnt in contours:
-		perim = cv2.arcLength(cnt, True) # approx perim
-		approx = cv2.approxPolyDP(cnt, 0.01*perim,True) # approximate the contours/ vertices 
-		# print(len(approx), end = " ")
+		perim = cv2.arcLength(cnt, True) 
+		approx = cv2.approxPolyDP(cnt, 0.01*perim, True) 
 		
 		if len(approx) == 4:
 			shape.append(DIAMOND)
@@ -79,9 +92,9 @@ def detectShapeCount(processed_img, debug=False):
 	return shape[0], len(shape) - 1 
 
 
-# for debugging
+
 if __name__ == "__main__":
-	print("You are running this in debug mode :) ")
+
 	import argparse
 
 	ap = argparse.ArgumentParser()
@@ -94,11 +107,10 @@ if __name__ == "__main__":
 	image = cv2.imread(args['image'],0)
 	kernel = np.ones((5,5), np.uint8)
 
-
 	if args['empty']:
 		x = processHollow(image)
 	else:
-		x = processStripesFull(image,kernel,0,True)
+		x = processStripesFull(image, kernel, 0, True)
 
 	print(detectShapeCount(x))
 	cv2.imshow("the image is" ,image)

@@ -1,3 +1,7 @@
+""" Class for the Robot's Memory (CardMem)
+author @odoland
+"""
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -17,11 +21,12 @@ from CardGen import * # the connection from the eyes to the brain
 SLEEP = 0.2
 
 
-
-class CardMemory:
-	""" class to store memory """
+class Roboset:
+	""" Robot to play set"""
 
 	def __init__(self, buttons_list):		
+		
+
 		self.cards_list = [None]*15
 		self.cards_map = {}
 		self.buttons = buttons_list
@@ -29,6 +34,8 @@ class CardMemory:
 
 
 	def find_Sets(self):	
+
+		# Produce a list of cards that are currently clickable for the Robot
 		clickable = [card for card in self.cards_list if card is not None]
 		length = len(clickable)
 		self.count = length
@@ -84,8 +91,6 @@ class CardMemory:
 				j += 1 # increment inner j loop
 			i += 1 # increment outer i loop
 					
-
-
 	def update_card_memory(self,*idx_list):
 		""" Updates the memory the self.cards_list and the cards_map. Updates only the indexes passed in """
 
@@ -175,14 +180,12 @@ if __name__ == '__main__':
 	TINTBS = np.array([200,250,200]),  np.array([235,255,235]) # Green tint boundary is 225,253,225
 	TINTBG = np.array([200,200,200]), np.array([225,225,225])
 	
-	PATH_TO_CHROME_DRIVER = '/Users/elisaur/Desktop/PythonScripts/autograder/chromedriver'
+	# PATH_TO_CHROME_DRIVER = '/Users/elisaur/Desktop/PythonScripts/autograder/chromedriver'
+	PATH_TO_CHROME_DRIVER = '/home/orlando/Projects/Autograder/chromedriver.exe'
+
 	URL = 'https://hills.ccsf.edu/~jfyfe/set.html'
 
 	ap = argparse.ArgumentParser()
-	# ap.add_argument("-s","--sleep", required=True, help="Put in the sleep time (multiplied by 5) ")
-
-	# args = vars(ap.parse_args())
-	# sleep_time = int(args['sleep'])
 
 	# Full Screen - to take full screenshot
 	chrome_options = Options()
@@ -194,14 +197,14 @@ if __name__ == '__main__':
 	time.sleep(2)
 
 	buttons_list = driver.find_elements(By.CLASS_NAME,"button") 
-	card_memory = CardMemory(buttons_list)
+	card_memory = Roboset(buttons_list)
 
-	CardMemory.checkPossibleSets()
+	Roboset.checkPossibleSets()
 	card_memory.update_card_memory()
 
 	while True:
 		card_memory.find_Sets()
-		extra_slot = CardMemory.checkPossibleSets()
+		extra_slot = Roboset.checkPossibleSets()
 		if extra_slot: 
 			card_memory.update_card_memory()
 

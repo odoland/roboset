@@ -1,12 +1,10 @@
-
-
 DIAMOND, SQUIGGLE, OVAL = 0, 1, 2
 PURPLE, GREEN, RED = 0, 1, 2
 HOLLOW, STRIPE, FULL = 0, 1, 2
 ONE, TWO, THREE = 0, 1, 2
 
 class SetCard:
-	""" Class to hold the attributes of the cards """
+	""" SetCard object representing a SetCard. Storing the values as integers """
 	
 	# Static Variables
 	shapes = ('Diamond', 'Squiggle', 'Oval')
@@ -19,8 +17,12 @@ class SetCard:
 		self.shape, self.color, self.fill, self.count = shape, color, fill, count
 
 	def hash(self):
+		""" Hashing formula of the card is just concatenating the four attributes.
+		The hash function is basically: shape*10^3 + color*10^2 + fill*10 + count 
+		"""
 		return "".join( str(x) for x in (self.shape,self.color,self.fill,self.count) )
 
+	# Operator overloading
 	def __eq__(self,other):
 		return (self.shape, self.color, self.fill, self.count) == (other.shape, other.color, other.fill, other.count)
 
@@ -30,6 +32,7 @@ class SetCard:
 	def __repr__(self):
 		return f"SetCard({self.shape},{self.color},{self.fill},{self.count})"
 
+	# Methods 
 	@classmethod
 	def getMatch(cls,card1,card2):
 		""" Returns card3, the matching set card """

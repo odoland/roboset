@@ -1,27 +1,26 @@
+"""
+Color Detection Module
+author @odoland
+"""
 import cv2
 import numpy as np
 
 
 def is_Blank(image):
-	"""
-	Checks if the image is actually just James's "Blank Card"
+	""" Checks to see if an image is the "Blank unclickable Card"
 	Blank Cards BGR values are:
 	 B: 151, G: 203, R: 237 
+	@Parameters: raw image 
+	@Returns: Boolean
 	"""
 	return np.array_equal(image[30,30],np.array([151,204,237]))
 
-	# In case the hues are different we can use a range:
-
-	# lower_blank, upper_blank = np.array ([157, 203, 230]), np.array([170,210,240])
-	# blank = cv2.inRange(image, lower_blank, upper_blank)
-	# return len(blank) > 300
-
 def has_Tint(image, tintbs, tintbg):
-	"""
-	Checks to see if the image has the Green tint - which means that card is already uses 
-	(tintbs for boundary- success - green)
-	(tintbf for bundary - failure - grey )
-	Returns boolean
+	""" Checks to see if the image has the Green tint - which means that card was a succesful 
+	@Paramters: image (raw image) np.array
+	tintbs (tuple of np.array (length 3 of BGR values)) for boundary- success - green)
+	tintbf(tuple of np.array (length 3 of BGR values)) for boundary - failure - grey )
+	@Returns boolean
 	"""
 	lower_success, upper_success = tintbs
 	lower_fail, upper_fail = tintbg
@@ -31,10 +30,13 @@ def has_Tint(image, tintbs, tintbg):
 
 
 def find_Color(image, purpb, greenb, redb ):
-	""" 
-	Pass in an image, and the lower and upper boundaries for each purple, green, red in BGR format
-	The color determined is the one with the most amount of pixels counted for each color category.
-	Returns at tuple: t
+	""" Finds the Color of an image based on the maximum count amongst the three boundaries.
+	@Paramters: image: Pass in an image lower and upper boundaries for each purple, green, red in BGR format
+	purpb  (tuple of np.array (length 3 of BGR values)) for boundary - purple)
+	greenb (tuple of np.array (length 3 of BGR values)) for boundary - green)
+	redb  (tuple of np.array (length 3 of BGR values)) for boundary - red)
+	
+	@Returns at tuple: t
 	t[0] Returns the color in number format (0 for purp, 1 for green, 2 for red)
 	t[1] Returns the count
 	"""
@@ -55,6 +57,7 @@ def find_Color(image, purpb, greenb, redb ):
 	colors = (mp, mg, mr)
 
 	total_pixels = max(colors)
+	
 	return colors.index(total_pixels), total_pixels
 
 
