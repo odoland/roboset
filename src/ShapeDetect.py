@@ -1,15 +1,13 @@
-""" 
+"""
 Shape Detection and Shape counter Module
 author @odoland
 """
 
 import cv2
 import numpy as np
-from matplotlib import pyplot as plt 
+from matplotlib import pyplot as plt
 
-
-from SetCard import DIAMOND, SQUIGGLE, OVAL
-from SetCard import ONE, TWO, THREE
+import SetCard
 
 
 def processHollow(image, threshold=200, debug=False):

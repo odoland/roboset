@@ -39,7 +39,7 @@ class Roboset:
 		clickable = [card for card in self.cards_list if card is not None]
 		length = len(clickable)
 		self.count = length
-
+		
 		i = 0
 		while i < self.count-1 and self.cards_list[i] is not None:
 			j = i + 1
@@ -48,14 +48,14 @@ class Roboset:
 				card1, card2 = self.cards_list[i], self.cards_list[j]
 				print(f"check {card1} {card2}")
 				
-				"""
+				#
 				# Handle 3-of-a-kind
-				if card1 == card2 and len(self.cards_map[card1.hash()]) == 3:
-					button_idx= self.cards_map[self.cards_list[i].hash()].pop()
-					self.cards_map.pop(self.cards_list[i].hash())
-					self.click_Sets(button_idx)
-					self.update_card_memory(button_idx)
-				"""
+				# if card1 == card2 and len(self.cards_map[card1.hash()]) == 3:
+				# 	button_idx= self.cards_map[self.cards_list[i].hash()].pop()
+				# 	self.cards_map.pop(self.cards_list[i].hash())
+				# 	self.click_Sets(button_idx)
+				# 	self.update_card_memory(button_idx)
+				#
 
 				if card1 and card2:  # Handle regular set
 					card3 = SetCard.getMatch(card1,card2)

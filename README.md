@@ -16,6 +16,8 @@ and cut off points were determined manually by hand!
 3. arrays, computation with **numpy**
 4. plotting and data with **matplotlib** and **scipy**
 
+The full conda environment is available in the environment.yml file
+Note that pip installation of opencv is used instead of conda installation
 ---
 
 ## Game
@@ -109,7 +111,7 @@ To fix this, I used a floodfill on the corner and then inverted the image - effe
 This way all images are pushed into 'solid' images for more accurate shape detection.
 
 
-** Set Finding Algorithm **
+**Set Finding Algorithm**
 
 Here's the pattern I observed:
 So we could store each attribute element as an integer (0, 1, 2). A set occurs when all elements are either unique, or in triplets.
