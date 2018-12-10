@@ -1,9 +1,13 @@
 # roboset
 
-This is just a little robot to play set! It was just a project for me to learn about basic image processing, and computer vision on my own :)
-The color and fill detection, and the set detection all are my own algorithms - see the explanation below.
-The first version was before I learned of machine learning algorithms - so all the parameters for each of my features
-and cut off points were determined manually by hand!
+This is just a little robot to play set! It was just a project for me to learn about basic image processing, and computer vision.
+I made my own algorithms for the color and fill detection (reinventing the wheel a bit)
+The first version was before I learned of machine learning algorithms - so all the parameters for each of features
+and cut off points were determined manually ( trial and error)
+
+Currently refactoring some of the stuff with ML.
+naive bayes for color detection
+(WIP) card object detection - because there's an issue with Window's Selenium taking the card images
 
 
 ## Video Demo:
@@ -23,19 +27,19 @@ Note that pip installation of opencv is used instead of conda installation
 ## Game
 
 [Explanation of the card game: Set](https://puzzles.setgame.com/set/rules_set.html)
-In short, every card has four categories.
+Every card has four categories, each category has exactly three states:
 
 A) Color : Red, Green or Purple
 B) Count : One, Two, Three
 C) Shape : Diamond, Oval, Squiggle
 D) Fill  : Hollow, Striped, Fill
 
-A 'Set' then, consists of three cards, that for each category is eitehr all the same or all different for each card.
+A 'Set' consists of three cards, that for each category is eitehr all the same or all different for each card.
 For example, for color - they would have to be either ALL the same (all red) or each different (red, green, purple)
 
 ## Theory
 
-The idea was to extract all four features from the images.
+The idea was to extract all four features from the images to determine what the card was and then pipe it to my own set detecting algorithm.
 
 --
 ### Detecting Color
@@ -98,6 +102,8 @@ Striped would have a constant swap back and forth, as seen here:
 [Selenium](https://www.seleniumhq.org/)
 Navigating to the website and taking screenshots of each card was done with Selenium. 
 It allows the robot to interact with the website - allowing it to locate the region of the buttons through the page source  and clicking them.
+For selenium, we enter the website, then take a screenshot of the cards, crop pictures by position of the buttons.
+Planning to replace this with object detection.
 
 [openCV](https://opencv.org/)
 - Sobel derivatives & filtered for peaks of 1/3rd (manually decided parameter) + pixel density for  fill / color.
@@ -113,8 +119,7 @@ This way all images are pushed into 'solid' images for more accurate shape detec
 
 **Set Finding Algorithm**
 
-Here's the pattern I observed:
-So we could store each attribute element as an integer (0, 1, 2). A set occurs when all elements are either unique, or in triplets.
+We could store each attribute element as an integer (0, 1, 2). A set occurs when all elements are either unique, or in triplets.
 Because of that, we can exploit the average of the three, of a 'set' will be an integer value. Or in other words, would be evenly divisible by three.
 
 Another thing to note is that for any two cards, the third is pre-determined. Because there is only one number possible that can make a number evenly divisible by 3 - which is the 'complement'.
@@ -126,4 +131,5 @@ Computation of the third member is done as a simple computation O(1).
 
 2018/11/05
 Working on adapting the vision into working on real images - with various tints, glares obstructions!
-Some classifier for fitting/predicting for each attribute (thinking SVM or naive bayes) WIP
+SVM/naive bayes classifier for fitting/predicting for each attribute (thinking SVM or naive bayes)
+Simple CNN for object (card) detection to avoid screenshot error
