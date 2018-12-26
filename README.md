@@ -1,14 +1,15 @@
 # roboset
 
-This is just a little robot to play set! It was just a project for me to learn about basic image processing, and computer vision.
-I made my own algorithms for the color and fill detection (reinventing the wheel a bit)
-The first version was before I learned of machine learning algorithms - so all the parameters for each of features
-and cut off points were determined manually ( trial and error)
+This is just a little robot to play set! It's my own personal research project to study basic image processing and computer vision.
+I made my own algorithms for the color and fill detection using just pure mathematics and creative problem solving.
 
-Currently refactoring some of the stuff with ML.
-naive bayes for color detection
-(WIP) card object detection - because there's an issue with Window's Selenium taking the card images
+The first version of "Roboset" was before I learned of machine learning algorithms and convolutional neural networks- so all the parameters for each of features and cut off points were determined manually ( trial and error)
 
+Currently refactoring some of the stuff as I am doing more research:
+
+1) naive bayes classifier for color detection
+2) CNN for card object detection - because there's an issue with Window's Selenium taking the card images
+3) CNN for shapes - solids stuff
 
 ## Video Demo:
 [video demo](https://www.youtube.com/watch?v=6uBgwcrD5Z4)
@@ -131,5 +132,6 @@ Computation of the third member is done as a simple computation O(1).
 
 2018/11/05
 Working on adapting the vision into working on real images - with various tints, glares obstructions!
-SVM/naive bayes classifier for fitting/predicting for each attribute (thinking SVM or naive bayes)
-Simple CNN for object (card) detection to avoid screenshot error
+SVM/naive bayes classifier for fitting/predicting 
+Simple CNN for object (card) detection to avoid screenshot error that's occuring for windows..
+I may need to do some aspect ratio modifications!
