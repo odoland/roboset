@@ -1,15 +1,11 @@
 # roboset
 
 This is just a little robot to play set! It's my own personal research project to study basic image processing and computer vision.
-I made my own algorithms for the color and fill detection using just pure mathematics and creative problem solving.
+I made my own algorithms for the color and fill detection based off of some computer vision algorithms and some modular mathematics.
 
-The first version of "Roboset" was before I learned of machine learning algorithms and convolutional neural networks- so all the parameters for each of features and cut off points were determined manually ( trial and error)
+The first version of "Roboset" was before I learned of machine learning algorithms and convolutional neural networks - so all the parameters for each of features and cut off points were determined manually ( trial and error)
 
-Currently refactoring some of the stuff as I am doing more research:
-
-1) naive bayes classifier for color detection
-2) CNN for card object detection - because there's an issue with Window's Selenium taking the card images
-3) CNN for shapes - solids stuff
+Currently refactoring some of the stuff (with version 2) as I am learning about CNNs.
 
 ## Video Demo:
 [video demo](https://www.youtube.com/watch?v=6uBgwcrD5Z4)
@@ -124,14 +120,5 @@ We could store each attribute element as an integer (0, 1, 2). A set occurs when
 Because of that, we can exploit the average of the three, of a 'set' will be an integer value. Or in other words, would be evenly divisible by three.
 
 Another thing to note is that for any two cards, the third is pre-determined. Because there is only one number possible that can make a number evenly divisible by 3 - which is the 'complement'.
-Because the third card is predetermined by the first two, this becomes a problem of just searching for the existence of that specific card generated from two cards - which reduces the time complexity from O(n^3) (finding combinations of three) into just finding combinations of two O(n^2) with the use of a HashMap for O(1) access.
+Because the third card is predetermined by the first two, this becomes a problem of just searching for the existence of that specific card generated from two cards - which reduces to just a problem of finding the "additive inverse" (in mod 3) of the sum of the first two. Reduces the amount of comparisons to just one, and also reduces the complexity.
 
-Computation of the third member is done as a simple computation O(1).
-
-**Future Features**
-
-2018/11/05
-Working on adapting the vision into working on real images - with various tints, glares obstructions!
-SVM/naive bayes classifier for fitting/predicting 
-Simple CNN for object (card) detection to avoid screenshot error that's occuring for windows..
-I may need to do some aspect ratio modifications!
