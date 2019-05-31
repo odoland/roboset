@@ -4,7 +4,7 @@ author @odoland
 """
 import cv2
 import numpy as np
-from attributes import Colors
+from .attributes import Colors
 
 
 class ColorDetector:

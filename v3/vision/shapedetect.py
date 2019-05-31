@@ -2,15 +2,15 @@
 Shape Detection and Shape counter Module
 author @odoland
 """
-
+from __future__ import absolute_import
 import cv2
 import numpy as np
 import matplotlib
 matplotlib.use("TkAgg") # Use TkAgg as backend to plot stuff  
 
 from matplotlib import pyplot as plt
-from attributes import Shapes
-from filldetect import FillDetector
+from .attributes import Shapes, Fills, Counts
+from .filldetect import FillDetector
 
 class ShapeDetector:
 
@@ -88,16 +88,35 @@ class ShapeDetector:
                 shape.append(Shapes.OVAL)
             else:
                 shape.append(Shapes.SQUIGGLE) # Squiggle range from 13, 14, 15 ... 
-        return shape[0], len(shape)
+        
+        mapping = {
+            1: Counts.ONE, 
+            2: Counts.TWO,
+            3: Counts.THREE
+        }
+        if len(shape) not in mapping:
+            if shape[0] == Shapes.SQUIGGLE:
+                amount = mapping[len(shape)//2] # probably the 2 green squiggles solid
+            else:
+                print('Run debugger. Something wrong w/ counts, not a squiggle', shape)
+                amount = 2
+        else:
+            amount = mapping[len(shape)]
+        # Amount of shapes detected -> map to an enum
+        return shape[0], amount
 
     @classmethod
     def find_shape_count(cls, image, debug=False):
         
         bw_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        if FillDetector.find_fill(image, plot=0) == "HOLLOW":
+        if FillDetector.find_fill(image, plot=0) == Fills.HOLLOW:
+            if debug:
+                print("Processing it as a hollow")
             processed_img = cls.process_hollow(bw_image, debug=debug)
         else:
+            if debug:
+                print("Processing as stripes or full")
             processed_img = cls.process_stripes_full(bw_image, debug=debug)
 
         return cls.detect_shape_count(processed_img, debug) 

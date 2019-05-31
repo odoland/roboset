@@ -10,11 +10,12 @@ class SetCard:
     def __init__(self, shape, color, fill, count):
         self.shape, self.color, self.fill, self.count = shape, color, fill, count
 
-    def hash(self):
-        """ Hashing formula of the card is just concatenating the four attributes.
-        The hash function is basically: shape*10^3 + color*10^2 + fill*10 + count
+    @property
+    def encoding(self):
+        """ Encoding formula of the card is just concatenating the four attributes.
+        The encode function is basically: shape*10^3 + color*10^2 + fill*10 + count
         """
-        return "".join(str(x) for x in (self.shape, self.color, self.fill, self.count))
+        return "".join(str(int(x)) for x in (self.shape, self.color, self.fill, self.count))
 
     # Operator overloading
     def __eq__(self, other):

@@ -10,11 +10,11 @@ from scipy.signal import find_peaks
 import matplotlib
 matplotlib.use("TkAgg") # Use TkAgg as backend to plot stuff  
 import matplotlib.pyplot as plt
-from colordetect import ColorDetector
-
-from attributes import Fills
-
 import itertools as it
+
+from .colordetect import ColorDetector
+from .attributes import Fills
+
 
 
 class FillDetector:
@@ -28,21 +28,31 @@ class FillDetector:
     KERNEL = np.ones((5,5), np.uint8) # For erosion and dilation
 
     @classmethod
-    def is_stripe(cls, image, number_peaks=10, plot=False):  # -> Boolean
+    def is_stripe(cls, image, number_peaks=6, plot=False):  # -> Boolean
         """ Checks if the image is striped.
         @Parameters: image matrix (binary form - black and white)
                     number_peaks (int) Number of peaks to be considered 'striped'
 
         @Returns Boolean, if striped.
         """
-        
+        single_line_count = cls.count_peaks(image, spot_ratio=0.45) # pesky diamond shapes
+        full_reduced_count = cls.count_peaks(image, spot_ratio=None) 
+    
+        return single_line_count > number_peaks and full_reduced_count > 12
+
+    @classmethod
+    def count_peaks(cls, image, spot_ratio=None, plot=False):
+              
         _, w , _ = image.shape
         
-        # Spot to go down the Y axis
-        spot = np.floor(w * 0.45).astype(int)
-    
-        # Use the Sobel operator across the Y to obtain the Gradient
-        sobel_gradient = cv2.Sobel(image[:, spot], cv2.CV_64F, 0, 1, ksize=5)  # vertical
+        if spot_ratio is None:
+            sobel_gradient = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=5)
+        else:
+            # Spot to go down the Y axis
+            spot = np.floor(w * spot_ratio).astype(int)
+        
+            # Use the Sobel operator across the Y to obtain the Gradient
+            sobel_gradient = cv2.Sobel(image[:, spot], cv2.CV_64F, 0, 1, ksize=5)  # vertical
 
         # Project it onto single dimension (1D) - by summing them
         projected_sum = cv2.reduce(sobel_gradient, 1, cv2.REDUCE_SUM)
@@ -70,7 +80,8 @@ class FillDetector:
             plt.plot(filtered_peaks, proj_pos_sums[filtered_peaks], "x")
             plt.show()
             print("Calling is_stripe:", len(filtered_peaks), "peaks found")
-        return len(filtered_peaks) > number_peaks
+        
+        return len(filtered_peaks)
 
     @classmethod
     def check_hollow_or_full(cls, image, color, pixel_count, plot=False):  # -> Returns either SetCard.HOLLOW or SetCard.FULL
