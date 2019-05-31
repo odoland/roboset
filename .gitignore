@@ -1,7 +1,7 @@
 .DS_Store
 __pycache__
 .vscode/
-v3/.vscode
-v3/driver/sample_*
-v3/driver/broken_cases
-v3/driver/images/
+src/.vscode
+src/driver/sample_*
+src/driver/broken_cases
+src/driver/images/
