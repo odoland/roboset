@@ -8,6 +8,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 import SetCard
+from SetCard import *
 
 
 def processHollow(image, threshold=200, debug=False):

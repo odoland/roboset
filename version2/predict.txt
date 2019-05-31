@@ -1,6 +1,0 @@
-predict - 1.jpg
-predict - 2.jpg
-predict - 3.jpg
-predict - 4.jpg
-predict - 5.jpg
-predict - 6.jpg

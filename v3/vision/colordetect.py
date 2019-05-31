@@ -4,14 +4,15 @@ author @odoland
 """
 import cv2
 import numpy as np
+from attributes import Colors
 
 
 class ColorDetector:
 
     # BGR format
-    PURPLE_RANGE = np.array([80, 0, 80]), np.array([160, 60, 160])
     GREEN_RANGE = np.array([0, 100, 0]), np.array([45, 180, 45])
     RED_RANGE = np.array([0, 0, 160]), np.array([30, 30, 255])
+    PURPLE_RANGE = np.array([80, 0, 80]), np.array([160, 60, 160])
 
     @classmethod
     def find_color(cls, image):
@@ -23,19 +24,22 @@ class ColorDetector:
         """
 
         # Filter image for whatever passes the boundaries
-        purples = cv2.inRange(image, *cls.PURPLE_RANGE)
         greens = cv2.inRange(image, *cls.GREEN_RANGE)
         reds = cv2.inRange(image, *cls.RED_RANGE)
+        purples = cv2.inRange(image, *cls.PURPLE_RANGE)
 
-        mp = len(np.flatnonzero(purples))
         mg = len(np.flatnonzero(greens))
         mr = len(np.flatnonzero(reds))
+        mp = len(np.flatnonzero(purples))
 
-        colors = (mp, mg, mr)
+        colors = (mg, mr, mp)
 
         total_pixels = max(colors)
+        
+        enum_colors = [Colors.GREEN, Colors.RED, Colors.PURPLE]
+        color_idx = int(np.argmax(colors))
 
-        return colors.index(total_pixels), total_pixels
+        return enum_colors[color_idx], total_pixels
 
 
 if __name__ == '__main__':
@@ -56,7 +60,7 @@ if __name__ == '__main__':
 
     debug = args['debug']  # for graphing
 
-    colors = ["purple", "green", "red"]
+    colors = ["green", "red", "purple"]
 
     # Create the Color
     index_of_color, total_pixels = ColorDetector.find_color(image) 

@@ -1,4 +1,4 @@
-name: opencv
+name: roboset
 channels:
   - anaconda
   - defaults

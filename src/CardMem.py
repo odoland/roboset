@@ -181,7 +181,7 @@ if __name__ == '__main__':
 	TINTBG = np.array([200,200,200]), np.array([225,225,225])
 	
 	# PATH_TO_CHROME_DRIVER = '/Users/elisaur/Desktop/PythonScripts/autograder/chromedriver'
-	PATH_TO_CHROME_DRIVER = '/home/orlando/Projects/Autograder/chromedriver.exe'
+	PATH_TO_CHROME_DRIVER = '/Users/orlando/Projects/roboset/chromedriver'
 
 	URL = 'https://hills.ccsf.edu/~jfyfe/set.html'
 
@@ -191,7 +191,7 @@ if __name__ == '__main__':
 	chrome_options = Options()
 	chrome_options.add_argument("--kiosk")
 
-	driver = webdriver.Chrome(executable_path=PATH_TO_CHROME_DRIVER, chrome_options=chrome_options)
+	driver = webdriver.Chrome(executable_path=PATH_TO_CHROME_DRIVER, options=chrome_options)
 	driver.get(URL)
 
 	time.sleep(2)

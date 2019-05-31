@@ -12,6 +12,8 @@ matplotlib.use("TkAgg") # Use TkAgg as backend to plot stuff
 import matplotlib.pyplot as plt
 from colordetect import ColorDetector
 
+from attributes import Fills
+
 import itertools as it
 
 
@@ -19,10 +21,14 @@ class FillDetector:
 
     # Threshold for the peaks
     PEAK_THRESH = 0.33
+
+    # Threshold of pixels to determine whether they are solid
+    PIXEL_THRESH = 3500
+
     KERNEL = np.ones((5,5), np.uint8) # For erosion and dilation
 
     @classmethod
-    def is_stripe(cls, image, number_peaks=12, plot=False):  # -> Boolean
+    def is_stripe(cls, image, number_peaks=10, plot=False):  # -> Boolean
         """ Checks if the image is striped.
         @Parameters: image matrix (binary form - black and white)
                     number_peaks (int) Number of peaks to be considered 'striped'
@@ -80,7 +86,7 @@ class FillDetector:
         _, thresh = cv2.threshold(dilation, 200, 255, cv2.THRESH_BINARY_INV)  # Threshold cut off value at 200 (white)
 
         _, w = image.shape
-        spot = np.floor(w * 0.45).astype(int)
+        spot = np.floor(w * 0.44).astype(int)
 
         # Use the Sobel operator across the Y to obtain the Gradient, projecting & removing negative signs
         first_deriv_y = cv2.Sobel(thresh[:, spot], cv2.CV_64F, 0, 1, ksize=5)
@@ -97,9 +103,7 @@ class FillDetector:
         peak_thresh_y = max(all_peak_heights) * (cls.PEAK_THRESH)
         filtered_peaks = [i for i in unfiltered_peaks_indices if vertical_projection[i] >= peak_thresh_y] 
 
-
         approx_peaks_y = len(filtered_peaks)
-        print("Peaks found:", approx_peaks_y)
         if plot:
             plt.plot(vertical_projection), plt.title("f'(x) of the image")
             plt.plot(filtered_peaks, vertical_projection[filtered_peaks], "x")
@@ -107,17 +111,21 @@ class FillDetector:
             print("Calling check_hollow_or_full:", len(filtered_peaks), "peaks found")
 
         if approx_peaks_y == 2:
-            return "FULL"
-        elif approx_peaks_y == 4:
-            return "HOLLOW"
+            return Fills.FULL
+        elif approx_peaks_y == 4: # Some solid squiggles may have 4 peaks
+            if pixel_count > cls.PIXEL_THRESH : # If they have a ton of pixels, they are solid
+                return Fills.FULL
+            else:
+                return Fills.HOLLOW
         else:
-            print("there are some weird peak counts", approx_peaks_y)
-            return "HOLLOW"
+            if plot: 
+                print("there are some weird peak counts", approx_peaks_y)
+            return Fills.HOLLOW
 
     @classmethod
     def find_fill(cls, image, plot=False):
         if cls.is_stripe(image, plot=plot):
-            return "STRIPE"
+            return Fills.STRIPE
         else:
             color, pixel_count = ColorDetector.find_color(image)
             bw_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
