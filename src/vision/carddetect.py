@@ -31,7 +31,6 @@ class CardDetector:
         shape = card_attributes['shape']
         fill = card_attributes['fill']
 
-
         print(count, color, fill, shape)
 
 

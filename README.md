@@ -1,14 +1,17 @@
 # roboset
 
-This is just a little robot to play set! It's my own personal research project to study basic image processing and computer vision.
+This is just a little robot to play set! It's my own personal project to study basic image processing and computer vision.
 I made my own algorithms for the color and fill detection based off of some computer vision algorithms and some modular mathematics.
 
-The first version of "Roboset" was before I learned of machine learning algorithms and convolutional neural networks - so all the parameters for each of features and cut off points were determined manually ( trial and error)
+The first version of "Roboset" was before I learned of machine learning algorithms and convolutional neural networks - so all the parameters for each of features and cut off points were determined manually (trial and error). It's actually really painful!
 
-Currently refactoring some of the stuff (with version 2) as I am learning about CNNs.
+This robot takes screenshots and plays set online. To try it out, clone my repo [here](https://github.com/odoland/set).
 
-## Video Demo:
-[video demo](https://www.youtube.com/watch?v=6uBgwcrD5Z4)
+![Gif](./examples/sample_clip.gif)
+
+## Video Demos:
+- [version2 video](https://www.youtube.com/watch?v=6uBgwcrD5Z4)
+- [version3 video](https://youtu.be/Qy968w5n8-s)
 
 ## Libraries used:
 
@@ -17,8 +20,20 @@ Currently refactoring some of the stuff (with version 2) as I am learning about 
 3. arrays, computation with **numpy**
 4. plotting and data with **matplotlib** and **scipy**
 
-The full conda environment is available in the environment.yml file
+The full conda environment is available in the environment.yaml file
 Note that pip installation of opencv is used instead of conda installation
+
+To use, make sure you install [conda](https://docs.conda.io/en/latest/)
+
+Recreate the conda environment:
+```bash
+conda env create -f environment.yaml
+```
+
+Run the driver:
+```bash
+python3 src/driver.py
+```
 ---
 
 ## Game
@@ -51,10 +66,6 @@ redb = np.array([0,0,160]), np.array([30,30,255])
 ```
 Then I just had to filter the image for all pixels that fell in this range, and the maximum counts that arises is the most likely color.
 
-**Update: 2018/11/02**
-Currently working on detecting the color in an imperfect image (real life photograph). 
-**Update: 2018/11/15**
-see color.py -> Naive Bayes classifier, using ratio of red, green, and purple pixels (from filtering through HSV) as the feature vector.
 
 ### Detecting Shape and Count
 To approximate the shape, I found all the contours (just a shape that joins all the points together as a continuos line)

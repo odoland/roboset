@@ -9,7 +9,7 @@ from driver.robotdriver import RobotDriver
  
 if __name__ == "__main__":
     SLEEP_BETWEEN_SCANNING = 0
-    SLEEP_BETWEEN_CLICKING = 0.12
+    SLEEP_BETWEEN_CLICKING = 0.11
 
     PATH_TO_CHROME_DRIVER = '/Users/orlando/Projects/roboset/chromedriver'
     URL = 'localhost:3000'
